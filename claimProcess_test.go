@@ -71,22 +71,25 @@ package main
 
 import (
 //	"bytes"
-	"encoding/json"
+//	"encoding/json"
 	"fmt"
+/*	"strconv"
 	"strings"
-	"strconv"
-//	"time"
+	"time"
+	*/
+	"testing"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
-	"github.com/hyperledger/fabric/protos/peer"
+//	"github.com/hyperledger/fabric/protos/peer"
+
 )
 
 //ClaimProcessChaincode example simple Chaincode implementation
-type ClaimProcessChaincode struct {
+type ClaimProcessChaincodeTest struct {
 }
 
 // @claimPart JSON object
-type claimInfo struct {
+type claimInfoTest struct {
 	ObjectType   				string `json:"docType"` //docType is used to distinguish the various types of objects in state database
 	SerialNumber 				string `json:"serialNumber"`
 	InsuredName  				string `json:"insuredName"`
@@ -110,12 +113,12 @@ type claimInfo struct {
 	FIRNumber						string `json:"firNumber"`
 	PoliceStation  			string `json:"policeStation"`
 	OtherPolicy       	bool   `json:"otherPolicy"`
-	OtherPolicyId       string   `json:"otherPolicyId"`
+	OtherPolicyId       string `json:"otherPolicyId"`
 	ClaimStatus  				string `json:"claimStatus"`
 }
 
 // @the bill information type is below
-type billInfo struct {
+type billInfoTest struct {
 	ObjectType         string 	`json:"docType"`       //docType is used to distinguish the various types of objects in state database
 	ClaimID      			 string 	`json:"claimID"`
 	ClaimItemId      	 string 	`json:"claimItemId"`
@@ -126,24 +129,57 @@ type billInfo struct {
 	Amount             string 	`json:"amount"`
 }
 
-
 // ===================================================================================
 // Main
 // ===================================================================================
-func main1() {
+func main() {
 	err := shim.Start(new(ClaimProcessChaincode))
 	if err != nil {
 		fmt.Printf("Error starting claim process chaincode: %s", err)
 	}
 }
 
-
+/*
 // Init initializes chaincode
 // ===========================
 func (t *ClaimProcessChaincode) Init(stub shim.ChaincodeStubInterface) peer.Response {
 	return shim.Success(nil)
-}
+} */
 
+func TestInitPartCreatesIndexes(t *testing.T) {
+	stub := shim.NewMockStub("mockChaincodeStub", new(ClaimProcessChaincode))
+	if stub == nil {
+			t.Fatalf("MockStub creation failed")
+		}
+		 args := [][]byte{
+			    []byte("initclaimProcess"), []byte("sr1234"),
+					[]byte("Deepak"), []byte("Pol1"),
+					[]byte("C1"), []byte("1502688979"),
+					[]byte("1502688979"), []byte("1502688979"),
+					[]byte("1502688979"), []byte("abc"),
+					[]byte("Female"), []byte("1502688979"),
+					[]byte("Wife"), []byte("Hospitalization"),
+					[]byte("City"), []byte("Dr Alok"),
+					[]byte("Fever"), []byte("Dengue"),
+					[]byte("false"), []byte("false"),
+					[]byte("0"), []byte("0"),
+					[]byte("false"), []byte("0"),
+					[]byte("Applied")}
+					invokeResult := stub.MockInvoke("12345", args)
+					fmt.Println("-invoking result ")
+					if invokeResult.Status != 200 {
+						t.Errorf("Create Part returned non-OK status, got: %d, want: %d.", invokeResult.Status, 200)
+					}
+					//Validate index was created
+					indexKey, _ := stub.CreateCompositeKey("claimInfo~claimID", []string{"Pol1","C1"})
+					fmt.Println("-invoking index entry ")
+					indexEntry, _ := stub.GetState(indexKey)
+		 			if indexEntry == nil {
+							t.Errorf("Index on assembler not created!")
+							}
+	}
+
+/*
 // Invoke - Our entry point for Invocations
 // ========================================
 func (t *ClaimProcessChaincode) Invoke(stub shim.ChaincodeStubInterface) peer.Response {
@@ -171,7 +207,7 @@ func (t *ClaimProcessChaincode) Invoke(stub shim.ChaincodeStubInterface) peer.Re
 		return t.getClaimStatus(stub, args)
 	} else if function == "updateClaimStatus" { //update Claim Status
 		return t.updateClaimStatus(stub, args)
-	} */
+	}
 
 	fmt.Println("invoke did not find func: " + function) //error
 	return shim.Error("Received unknown function invocation")
@@ -306,7 +342,7 @@ func (t *ClaimProcessChaincode) initclaimProcess(stub shim.ChaincodeStubInterfac
 	return shim.Success(nil)
 }
 
-/*
+
 // ============================================================
 // initVehicle - create a new bill Info , store into chaincode state
 // ============================================================
@@ -405,6 +441,7 @@ func (t *ClaimProcessChaincode) createIndex(stub shim.ChaincodeStubInterface, in
 	fmt.Println("- end create index")
 	return nil
 }
+
 
 // ===============================================
 // deleteIndex - remove search index for ledger
@@ -761,4 +798,6 @@ func (t *AutoTraceChaincode) setPartRecallState(stub shim.ChaincodeStubInterface
 	fmt.Println("- end setPartRecallState")
 	return shim.Success(nil)
 }
+
+
 */
