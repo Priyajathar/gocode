@@ -87,43 +87,43 @@ type ClaimProcessChaincode struct {
 
 // @claimPart JSON object
 type claimInfo struct {
-	ObjectType   string `json:"docType"` //docType is used to distinguish the various types of objects in state database
-	SerialNumber string `json:"serialNumber"`
-	InsuredName  string `json:"insuredName"`
-	PolicyID     string `json:"policyID"`
-	ClaimID      string `json:"claimID"`
-	InsuranceStartDate int    `json:"insuranceStartDate"`
-	InsuranceEndDate int    `json:"insuranceEndDate"`
-	AdmissionDate int    `json:"admissionDate"`
-	DischargeDate int    `json:"dischargeDate"`
-	PatientName  string `json:"patientName"`
-	PatientGender  string `json:"patientGender"`
-	DOB int    `json:"dob"`
-	Relationship  string `json:"relationship"`
-	ClaimType  string `json:"claimType"`
-	HospitalName  string `json:"hospitalName"`
-	DoctorName  string `json:"doctorName"`
-	NatureOfIllness string `json:"natureOfIllness"`
-	Diagnosis string `json:"diagnosis"`
-	Accident       bool   `json:"accident"`
-	FIR       bool   `json:"fir"`
-	FIRNumber	int `json:"firNumber"`
-	PoliceStation  string `json:"policeStation"`
-	OtherPolicy       bool   `json:"otherPolicy"`
-	OtherPolicyId       bool   `json:"otherPolicyId"`
-	claimStatus  string `json:"claimStatus"`
+	ObjectType   				string `json:"docType"` //docType is used to distinguish the various types of objects in state database
+	SerialNumber 				string `json:"serialNumber"`
+	InsuredName  				string `json:"insuredName"`
+	PolicyID     				string `json:"policyID"`
+	ClaimID      				string `json:"claimID"`
+	InsuranceStartDate 	int    `json:"insuranceStartDate"`
+	InsuranceEndDate 		int    `json:"insuranceEndDate"`
+	AdmissionDate 			int    `json:"admissionDate"`
+	DischargeDate 			int    `json:"dischargeDate"`
+	PatientName  				string `json:"patientName"`
+	PatientGender  			string `json:"patientGender"`
+	DOB 								int 	 `json:"dob"`
+	Relationship  			string `json:"relationship"`
+	ClaimType  					string `json:"claimType"`
+	HospitalName  			string `json:"hospitalName"`
+	DoctorName  				string `json:"doctorName"`
+	NatureOfIllness 		string `json:"natureOfIllness"`
+	Diagnosis 					string `json:"diagnosis"`
+	Accident       			bool   `json:"accident"`
+	FIR       					bool   `json:"fir"`
+	FIRNumber						int 	 `json:"firNumber"`
+	PoliceStation  			string `json:"policeStation"`
+	OtherPolicy       	bool   `json:"otherPolicy"`
+	OtherPolicyId       string   `json:"otherPolicyId"`
+	ClaimStatus  				string `json:"claimStatus"`
 }
 
 // @the bill information type is below
 type billInfo struct {
-	ObjectType         string `json:"docType"`       //docType is used to distinguish the various types of objects in state database
-	ClaimID      string `json:"claimID"`
-	ClaimItemId      string `json:"claimItemId"`
-	Description       string `json:"description"`
-	BillNo              string `json:"billNo"`
-	BillDate       int    `json:"billDate"`
-	BillType string `json:"billType"`
-	Amount              string `json:"amount"`
+	ObjectType         string 	`json:"docType"`       //docType is used to distinguish the various types of objects in state database
+	ClaimID      			 string 	`json:"claimID"`
+	ClaimItemId      	 string 	`json:"claimItemId"`
+	Description        string 	`json:"description"`
+	BillNo             string 	`json:"billNo"`
+	BillDate       		 int   	  `json:"billDate"`
+	BillType 					 string 	`json:"billType"`
+	Amount             string 	`json:"amount"`
 }
 
 // ===================================================================================
@@ -196,6 +196,9 @@ func (t *ClaimProcessChaincode) initclaimProcess(stub shim.ChaincodeStubInterfac
 	if len(args[1]) <= 0 {
 		return shim.Error("2nd argument must be a non-empty string")
 	}
+	if len(args[2]) <= 0 {
+		return shim.Error("3rd argument must be a non-empty string")
+	}
 	if len(args[3]) <= 0 {
 		return shim.Error("4th argument must be a non-empty string")
 	}
@@ -222,8 +225,8 @@ func (t *ClaimProcessChaincode) initclaimProcess(stub shim.ChaincodeStubInterfac
 	}
 	serialNumber := args[0]
 	insuredName := strings.ToLower(args[1])
-	policyID := strings.ToLower(arg[2])
-	claimID := strings.ToLower(arg[3])
+	policyID := strings.ToLower(args[2])
+	claimID := strings.ToLower(args[3])
 	insuranceStartDate, err := strconv.Atoi(args[4])
 	if err != nil {
 		return shim.Error("4rd argument must be a numeric string")
@@ -257,15 +260,20 @@ func (t *ClaimProcessChaincode) initclaimProcess(stub shim.ChaincodeStubInterfac
 	if err != nil {
 		return shim.Error("17th argument must be a boolean string")
 	}
+
 	fir, err := strconv.ParseBool(args[18])
 	if err != nil {
 		return shim.Error("17th argument must be a boolean string")
 	}
 
-	firNumber:= strings.ToLower(args[19])
+	firNumber:= args[19]
 	policeStation:= strings.ToLower(arg[20])
-	otherPolicy:= strings.ToLower(arg[21])
-	otherPolicyId:= strings.ToLower(arg[22])
+	otherPolicy, err := strconv.ParseBool(args[21])
+
+	if err != nil {
+		return shim.Error("20th argument must be a boolean string")
+	}
+	otherPolicyId:= arg[22]
 	claimStatus:= strings.ToLower(arg[23])
 
 	// ==== Check if claim already exists ====
