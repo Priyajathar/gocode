@@ -107,7 +107,7 @@ type claimInfo struct {
 	Diagnosis 					string `json:"diagnosis"`
 	Accident       			bool   `json:"accident"`
 	FIR       					bool   `json:"fir"`
-	FIRNumber						int 	 `json:"firNumber"`
+	FIRNumber						string `json:"firNumber"`
 	PoliceStation  			string `json:"policeStation"`
 	OtherPolicy       	bool   `json:"otherPolicy"`
 	OtherPolicyId       string   `json:"otherPolicyId"`
@@ -258,7 +258,7 @@ func (t *ClaimProcessChaincode) initclaimProcess(stub shim.ChaincodeStubInterfac
 	diagnosis:= strings.ToLower(args[16])
 	accident, err := strconv.ParseBool(args[17])
 	if err != nil {
-		return shim.Error("17th argument must be a boolean string")
+		return shim.Error("16th argument must be a boolean string")
 	}
 
 	fir, err := strconv.ParseBool(args[18])
@@ -266,15 +266,15 @@ func (t *ClaimProcessChaincode) initclaimProcess(stub shim.ChaincodeStubInterfac
 		return shim.Error("17th argument must be a boolean string")
 	}
 
-	firNumber:= args[19]
-	policeStation:= strings.ToLower(arg[20])
+	firNumber:= strings.ToLower(args[19])
+	policeStation:= strings.ToLower(args[20])
 	otherPolicy, err := strconv.ParseBool(args[21])
 
 	if err != nil {
 		return shim.Error("20th argument must be a boolean string")
 	}
-	otherPolicyId:= arg[22]
-	claimStatus:= strings.ToLower(arg[23])
+	otherPolicyId:= args[22]
+	claimStatus:= strings.ToLower(args[23])
 
 	// ==== Check if claim already exists ====
 	claimAsBytes, err := stub.GetState(claimID)
@@ -287,7 +287,7 @@ func (t *ClaimProcessChaincode) initclaimProcess(stub shim.ChaincodeStubInterfac
 
 	// ==== Create claimInfo object and marshal to JSON ====
 	objectType := "claimInfo"
-	claimInfo := &claimInfo{objectType, serialNumber,insuredName,policyID,claimID,insuranceStartDate,insuranceEndDate,admissionDate,dischargeDate,patientName,patientGender,dob,relationship,claimType,hospitalName,doctorName,natureOfIllness,diagnosis,accident,fir,firNumber,policeStation,otherPolicy,otherPolicyId, claimStatus }
+	claimInfo := &claimInfo{objectType, serialNumber,insuredName,policyID,claimID,insuranceStartDate,insuranceEndDate,admissionDate,dischargeDate,patientName,patientGender,dob,relationship,claimType,hospitalName,doctorName,natureOfIllness,diagnosis,accident,fir,firNumber,policeStation,otherPolicy,otherPolicyId,claimStatus }
 	claimJSONasBytes, err := json.Marshal(claimInfo)
 	if err != nil {
 		return shim.Error(err.Error())
